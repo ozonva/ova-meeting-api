@@ -3,3 +3,6 @@ build:
 
 run:
 	go run cmd/ova-meeting-api/main.go
+
+test:
+	 go test ./internal/utils/
