@@ -1,11 +1,14 @@
 package utils
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFilterSlice(t *testing.T) {
+	assertions := assert.New(t)
+
 	var testParams = []struct {
 		testName string
 		input    []string
@@ -17,9 +20,6 @@ func TestFilterSlice(t *testing.T) {
 		{"Input with no filtered element", []string{"b", "c", "d"}, []string{"b", "c", "d"}},
 	}
 	for _, testParam := range testParams {
-		result := FilterSlice(testParam.input)
-		if !reflect.DeepEqual(result, testParam.output) {
-			t.Errorf("%s: Expected: '%v'; Got: '%v'", testParam.testName, testParam.output, result)
-		}
+		assertions.Equal(testParam.output, FilterSlice(testParam.input), "Should be equal. "+testParam.testName)
 	}
 }

@@ -16,13 +16,13 @@ func getFilter() []string {
 	return []string{"a", "e", "i", "o", "u", "y"}
 }
 
-func getFilterAsMapKeys() map[string]bool {
-	result := make(map[string]bool, 0)
+func getFilterAsMapKeys() map[string]struct{} {
+	result := make(map[string]struct{}, 0)
 	for _, v := range getFilter() {
 		if _, ok := result[v]; ok {
 			continue
 		}
-		result[v] = true
+		result[v] = struct{}{}
 	}
 	return result
 }

@@ -1,11 +1,13 @@
 package utils
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSplitSlice(t *testing.T) {
+	assertions := assert.New(t)
 	var testParams = []struct {
 		testName string
 		input    []string
@@ -19,22 +21,8 @@ func TestSplitSlice(t *testing.T) {
 		{"Split chunk size 4", []string{"a", "b", "c"}, 4, [][]string{{"a", "b", "c"}}},
 	}
 	for _, testParam := range testParams {
-		result := SplitSlice(testParam.input, uint(testParam.chunk))
-		if !reflect.DeepEqual(result, testParam.output) {
-			t.Errorf("%s: Expected: '%v'; Got: '%v'", testParam.testName, testParam.output, result)
-		}
+		assertions.Equal(testParam.output, SplitSlice(testParam.input, uint(testParam.chunk)), "Should be equal. "+testParam.testName)
 	}
 
-	TestSplitSlicePanic(t)
-}
-
-func TestSplitSlicePanic(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The code did not panic")
-		}
-	}()
-
-	// The following is the code under test
-	_ = SplitSlice([]string{"a", "b", "c"}, 0)
+	assert.Panics(t, func() { SplitSlice([]string{"a", "b", "c"}, 0) })
 }
