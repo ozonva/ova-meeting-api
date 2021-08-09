@@ -1,5 +1,7 @@
 package utils
 
+// SplitSlice split target slice to slice of slices. Each slice, except last, will have size of chunkSize
+// Example {"a", "b", "c"} with chunkSize 2 => {{"a", "b"}, {"c"}}
 func SplitSlice(slice []string, chunkSize uint) [][]string {
 	if chunkSize == 0 {
 		panic("Chunk size must be more than 0")
@@ -9,7 +11,7 @@ func SplitSlice(slice []string, chunkSize uint) [][]string {
 		return [][]string{}
 	}
 	if sliceLen < chunkSize {
-		resultSlice := make([][]string, 1)
+		resultSlice := make([][]string, 0)
 		resultSlice = append(resultSlice, slice)
 		return resultSlice
 	}

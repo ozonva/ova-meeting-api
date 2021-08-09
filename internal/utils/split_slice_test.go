@@ -16,6 +16,7 @@ func TestSplitSlice(t *testing.T) {
 		{"Split chunk size 1", []string{"a", "b", "c"}, 1, [][]string{{"a"}, {"b"}, {"c"}}},
 		{"Split chunk size 2", []string{"a", "b", "c"}, 2, [][]string{{"a", "b"}, {"c"}}},
 		{"Split chunk size 3", []string{"a", "b", "c"}, 3, [][]string{{"a", "b", "c"}}},
+		{"Split chunk size 4", []string{"a", "b", "c"}, 4, [][]string{{"a", "b", "c"}}},
 	}
 	for _, testParam := range testParams {
 		result := SplitSlice(testParam.input, uint(testParam.chunk))
