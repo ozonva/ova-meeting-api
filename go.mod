@@ -1,4 +1,4 @@
-module ova-meeting-api
+module github.com/ozonva/ova-meeting-api
 
 go 1.16
 
