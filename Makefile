@@ -6,3 +6,4 @@ run:
 
 test:
 	 go test ./internal/utils/
+	 go test ./internal/models/
