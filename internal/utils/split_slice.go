@@ -11,8 +11,8 @@ func SplitSlice(slice []string, chunkSize uint) [][]string {
 		return [][]string{}
 	}
 	if sliceLen < chunkSize {
-		resultSlice := make([][]string, 0)
-		resultSlice = append(resultSlice, slice)
+		resultSlice := make([][]string, 1)
+		resultSlice[0] = slice
 		return resultSlice
 	}
 	resSliceLen := sliceLen / chunkSize // The integer part of division
@@ -20,7 +20,7 @@ func SplitSlice(slice []string, chunkSize uint) [][]string {
 	if modulo > 0 {
 		resSliceLen++
 	}
-	resultSlice := make([][]string, 0)
+	resultSlice := make([][]string, 0, resSliceLen)
 	for start := uint(0); start < sliceLen; start += chunkSize {
 		end := start + chunkSize
 		if end > sliceLen {

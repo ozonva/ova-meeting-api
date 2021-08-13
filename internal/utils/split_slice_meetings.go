@@ -2,6 +2,7 @@ package utils
 
 import "github.com/ozonva/ova-meeting-api/internal/models"
 
+// SplitSliceMeetings split slice of models.Meetings to slice of slices
 func SplitSliceMeetings(slice []models.Meeting, chunkSize uint) [][]models.Meeting {
 	if chunkSize == 0 {
 		panic("Chunk size must be more than 0")
@@ -20,7 +21,7 @@ func SplitSliceMeetings(slice []models.Meeting, chunkSize uint) [][]models.Meeti
 	if modulo > 0 {
 		resSliceLen++
 	}
-	resultSlice := make([][]models.Meeting, 0)
+	resultSlice := make([][]models.Meeting, 0, resSliceLen)
 	for start := uint(0); start < sliceLen; start += chunkSize {
 		end := start + chunkSize
 		if end > sliceLen {
