@@ -10,7 +10,7 @@ func SliceToMap(input []models.Meeting) map[uuid.UUID]models.Meeting {
 	result := make(map[uuid.UUID]models.Meeting)
 
 	for _, m := range input {
-		result[m.Id] = m
+		result[m.ID] = m
 	}
 
 	return result

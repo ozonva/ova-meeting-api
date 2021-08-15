@@ -14,19 +14,19 @@ func TestSliceToMap(t *testing.T) {
 	u2 := uuid.New()
 	var meetings = []models.Meeting{
 		{
-			Id:     u1,
-			UserId: 1,
+			ID:     u1,
+			UserID: 1,
 			State: models.MeetingState{
-				Id:   1,
+				ID:   1,
 				Name: "New",
 			},
 			Users: []uint64{1, 2},
 		},
 		{
-			Id:     u2,
-			UserId: 2,
+			ID:     u2,
+			UserID: 2,
 			State: models.MeetingState{
-				Id:   2,
+				ID:   2,
 				Name: "Cancelled",
 			},
 			Users: []uint64{2, 3},

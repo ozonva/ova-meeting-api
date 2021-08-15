@@ -1,6 +1,6 @@
 package models
 
 type MeetingState struct {
-	Id   uint   `json:"id"`
+	ID   uint   `json:"id"`
 	Name string `json:"name"`
 }

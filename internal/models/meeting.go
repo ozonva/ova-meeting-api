@@ -1,24 +1,25 @@
 package models
 
 import (
+	"errors"
 	"github.com/google/uuid"
 )
 
 type Meeting struct {
-	Id     uuid.UUID    `json:"id"`
-	UserId uint64       `json:"user_id"`
+	ID     uuid.UUID    `json:"id"`
+	UserID uint64       `json:"user_id"`
 	State  MeetingState `json:"state"`
 	Users  []uint64     `json:"users,omitempty"`
 }
 
 // String return string info about meeting
 func (m Meeting) String() string {
-	return "Meeting with id " + m.Id.String() + " has a " + m.State.Name + " state"
+	return "Meeting with id " + m.ID.String() + " has a " + m.State.Name + " state"
 }
 
 // GenerateId generate new meeting id
 func (m *Meeting) GenerateId() {
-	m.Id = uuid.New()
+	m.ID = uuid.New()
 }
 
 // InviteUser user with ID to the current meeting
@@ -32,8 +33,8 @@ func (m *Meeting) InviteUser(user uint64) {
 
 // RemoveUser remove user from meeting
 func (m *Meeting) RemoveUser(user uint64) {
-	curPos := m.userPos(user)
-	if curPos >= 0 {
+	curPos, err := m.userPos(user)
+	if err == nil {
 		m.Users[curPos] = m.Users[len(m.Users)-1]
 		m.Users = m.Users[:len(m.Users)-1]
 	}
@@ -42,6 +43,11 @@ func (m *Meeting) RemoveUser(user uint64) {
 // ChangeState change current meeting state to the new one
 func (m *Meeting) ChangeState(newState MeetingState) {
 	m.State = newState
+}
+
+// GetState return current meeting state
+func (m Meeting) GetState() MeetingState {
+	return m.State
 }
 
 func (m Meeting) invitedUsersAsMap() map[uint64]struct{} {
@@ -55,11 +61,11 @@ func (m Meeting) invitedUsersAsMap() map[uint64]struct{} {
 	return result
 }
 
-func (m Meeting) userPos(user uint64) int {
+func (m Meeting) userPos(user uint64) (int, error) {
 	for p, v := range m.Users {
 		if v == user {
-			return p
+			return p, nil
 		}
 	}
-	return -1
+	return -1, errors.New("user not found")
 }

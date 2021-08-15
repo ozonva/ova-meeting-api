@@ -5,14 +5,21 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/ozonva/ova-meeting-api/internal/models"
 )
 
+const readAllEntities = 0
+
 func main() {
-	// fmt.Println("Hello from ova-meeting-api. 👋")
-	pwd, _ := os.Getwd()
-	storagePath := pwd + "/storage"
+	var meetings []models.Meeting
+	pwd, err := os.Getwd()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	storagePath := filepath.Join(pwd, "storage")
 	meetingListDir, err := os.Open(storagePath)
 	if err != nil {
 		log.Println(err)
@@ -25,13 +32,16 @@ func main() {
 		}
 	}(meetingListDir)
 
-	meetingFiles, _ := meetingListDir.ReadDir(0)
-	var meetings []models.Meeting
+	meetingFiles, err := meetingListDir.ReadDir(readAllEntities)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	for index := range meetingFiles {
 
 		meetingFile := meetingFiles[index]
 		meetingFileName := meetingFile.Name()
-		meeting, err := readMeetingFile(storagePath + "/" + meetingFileName)
+		meeting, err := readMeetingFile(filepath.Join(storagePath, meetingFileName))
 		if err != nil {
 			log.Fatalln(err)
 		}

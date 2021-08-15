@@ -8,10 +8,10 @@ import (
 )
 
 var m = Meeting{
-	Id:     uuid.New(),
-	UserId: 1,
+	ID:     uuid.New(),
+	UserID: 1,
 	State: MeetingState{
-		Id:   1,
+		ID:   1,
 		Name: "New",
 	},
 	Users: []uint64{},
@@ -20,7 +20,7 @@ var m = Meeting{
 func TestMeeting_ChangeState(t *testing.T) {
 	assertions := assert.New(t)
 	newState := MeetingState{
-		Id:   2,
+		ID:   2,
 		Name: "Started",
 	}
 	m.ChangeState(newState)
@@ -29,9 +29,9 @@ func TestMeeting_ChangeState(t *testing.T) {
 
 func TestMeeting_GenerateId(t *testing.T) {
 	assertions := assert.New(t)
-	oldId := m.Id
+	oldId := m.ID
 	m.GenerateId()
-	assertions.NotEqual(oldId, m.Id, "Should be not equal")
+	assertions.NotEqual(oldId, m.ID, "Should be not equal")
 }
 
 func TestMeeting_InviteUser(t *testing.T) {
