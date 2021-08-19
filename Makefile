@@ -7,3 +7,7 @@ run:
 test:
 	 go test ./internal/utils/
 	 go test ./internal/models/
+	 go test ./internal/flusher/
+
+ generate:
+	 go generate ./...
