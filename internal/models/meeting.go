@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+
 	"github.com/google/uuid"
 )
 
@@ -10,6 +11,20 @@ type Meeting struct {
 	UserID uint64       `json:"user_id"`
 	State  MeetingState `json:"state"`
 	Users  []uint64     `json:"users,omitempty"`
+}
+
+// NewMeeting create new Meeting
+func NewMeeting(userId uint64) Meeting {
+	meeting := Meeting{
+		UserID: userId,
+		State: MeetingState{
+			ID:   1,
+			Name: "New",
+		},
+		Users: []uint64{},
+	}
+	meeting.GenerateId()
+	return meeting
 }
 
 // String return string info about meeting
