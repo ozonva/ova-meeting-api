@@ -8,6 +8,7 @@ test:
 	 go test ./internal/utils/
 	 go test ./internal/models/
 	 go test ./internal/flusher/
+	 go test ./internal/saver/
 
  generate:
 	 go generate ./...
