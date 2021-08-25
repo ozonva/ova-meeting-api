@@ -11,7 +11,6 @@ import (
 
 type Saver interface {
 	Save(entity models.Meeting) error
-	init()
 	Close()
 }
 
@@ -22,11 +21,12 @@ func NewSaver(
 	timeout time.Duration,
 ) Saver {
 	saver := saver{
-		flusher: flusher,
-		buffer:  make([]models.Meeting, 0, capacity),
-		timeout: timeout,
+		flusher:    flusher,
+		buffer:     make([]models.Meeting, 0, capacity),
+		ticker:     time.NewTicker(timeout),
+		signalChan: make(chan struct{}),
 	}
-	saver.init()
+	saver.periodicSave()
 	return &saver
 }
 
@@ -34,7 +34,6 @@ type saver struct {
 	sync.Mutex
 	flusher    flusher.Flusher
 	buffer     []models.Meeting
-	timeout    time.Duration
 	signalChan chan struct{}
 	ticker     *time.Ticker
 }
@@ -51,10 +50,7 @@ func (s *saver) Close() {
 	close(s.signalChan)
 }
 
-func (s *saver) init() {
-	s.signalChan = make(chan struct{})
-	s.ticker = time.NewTicker(s.timeout)
-
+func (s *saver) periodicSave() {
 	go func(ch <-chan struct{}) {
 		for {
 			select {
