@@ -58,15 +58,3 @@ func (mr *MockSaverMockRecorder) Save(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockSaver)(nil).Save), arg0)
 }
-
-// init mocks base method
-func (m *MockSaver) init() {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "init")
-}
-
-// init indicates an expected call of init
-func (mr *MockSaverMockRecorder) init() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "init", reflect.TypeOf((*MockSaver)(nil).init))
-}

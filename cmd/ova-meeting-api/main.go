@@ -1,78 +1,62 @@
 package main
 
 import (
-	"encoding/json"
-	"io/ioutil"
+	"context"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/ozonva/ova-meeting-api/internal/api"
+	desc "github.com/ozonva/ova-meeting-api/pkg/ova-meeting-api"
+	"google.golang.org/grpc"
 	"log"
-	"os"
-	"path/filepath"
-
-	"github.com/ozonva/ova-meeting-api/internal/models"
+	"net"
+	"net/http"
 )
 
-const readAllEntities = 0
+const (
+	readAllEntities    = 0
+	grpcPort           = ":82"
+	grpcServerEndpoint = "localhost:82"
+	jsonEndpoint       = ":8081"
+)
 
-func main() {
-	var meetings []models.Meeting
-	pwd, err := os.Getwd()
+func runJSON() {
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	mux := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithInsecure()}
+
+	err := desc.RegisterMeetingsHandlerFromEndpoint(ctx, mux, grpcServerEndpoint, opts)
 	if err != nil {
-		log.Println(err)
-		return
+		panic(err)
 	}
-	storagePath := filepath.Join(pwd, "storage")
-	meetingListDir, err := os.Open(storagePath)
+
+	err = http.ListenAndServe(jsonEndpoint, mux)
 	if err != nil {
-		log.Println(err)
-		return
+		panic(err)
 	}
-	defer func(d *os.File) {
-		err := d.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(meetingListDir)
-
-	meetingFiles, err := meetingListDir.ReadDir(readAllEntities)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	for index := range meetingFiles {
-
-		meetingFile := meetingFiles[index]
-		meetingFileName := meetingFile.Name()
-		meeting, err := readMeetingFile(filepath.Join(storagePath, meetingFileName))
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		meetings = append(meetings, meeting)
-	}
-
-	log.Printf("%v", meetings)
 }
 
-func readMeetingFile(filename string) (models.Meeting, error) {
-	var m models.Meeting
-	f, err := os.Open(filename)
+func run() error {
+	listen, err := net.Listen("tcp", grpcPort)
 	if err != nil {
-		return m, err
-	}
-	defer func(f *os.File) {
-		err := f.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(f)
-
-	byteValue, err := ioutil.ReadAll(f)
-	if err != nil {
-		return m, err
-	}
-	err = json.Unmarshal(byteValue, &m)
-	if err != nil {
-		return m, err
+		log.Fatalf("failed to listen: %v", err)
 	}
 
-	return m, nil
+	s := grpc.NewServer()
+	desc.RegisterMeetingsServer(s, api.NewApiServer())
+
+	if err := s.Serve(listen); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
+
+	return nil
+}
+
+func main() {
+	go runJSON()
+
+	if err := run(); err != nil {
+		log.Fatal(err)
+	}
 }
