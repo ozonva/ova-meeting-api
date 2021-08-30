@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package ova.meeting.api;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/ozonva/ova-meeting-api/pkg/ova-meeting-api";
+
+
+service Meetings {
+  // AddMeetingRequestV1V1 create new Meeting
+  rpc CreateMeetingV1(AddMeetingRequestV1) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/add-meeting"
+    };
+  }
+
+  // DescribeMeetingV1 get Meeting Info by ID
+  rpc DescribeMeetingV1(MeetingIDRequestV1) returns (MeetingResponseV1) {
+    option (google.api.http) = {
+      get: "/v1/meeting"
+    };
+  }
+
+  // ListMeetingsV1 get all Meetings
+  rpc ListMeetingsV1(google.protobuf.Empty) returns (ListMeetingsResponseV1){
+    option (google.api.http) = {
+      get: "/v1/list"
+    };
+  };
+
+  // RemoveMeetingV1 remove Meeting by ID
+  rpc RemoveMeetingV1(MeetingIDRequestV1) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      delete: "/v1/meeting"
+    };
+  };
+}
+
+message AddMeetingRequestV1{
+  uint64 userid = 2;
+  MeetingStateV1 state = 3;
+  MeetingUsersV1 users = 4;
+}
+
+message MeetingIDRequestV1 {
+  UUID id = 1;
+}
+
+message MeetingStateV1{
+  uint64 id = 1;
+  string name = 2;
+}
+
+message MeetingUsersV1{
+  repeated uint64 Users = 1;
+}
+
+message ListMeetingsResponseV1{
+  repeated MeetingResponseV1 Items = 1;
+}
+
+message MeetingResponseV1{
+  UUID id = 1;
+  uint64 userid = 2;
+  MeetingStateV1 state = 3;
+  MeetingUsersV1 users = 4;
+}
+
+message UUID {
+  string value = 1;
+}
