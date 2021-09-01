@@ -2,13 +2,16 @@ package models
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 type Meeting struct {
 	ID     uuid.UUID    `json:"id"`
-	UserID uint64       `json:"user_id"`
+	Title  string       `json:"title"`
+	UserID uint64       `json:"user_id" db:"creator"`
+	Date   time.Time    `json:"date" db:"meeting_date"`
 	State  MeetingState `json:"state"`
 	Users  []uint64     `json:"users,omitempty"`
 }
