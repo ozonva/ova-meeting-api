@@ -4,6 +4,7 @@ package ova.meeting.api;
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ozonva/ova-meeting-api/pkg/ova-meeting-api";
 
@@ -12,19 +13,28 @@ service Meetings {
   // AddMeetingRequestV1V1 create new Meeting
   rpc CreateMeetingV1(AddMeetingRequestV1) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/v1/add-meeting"
+      post: "/v1/add-meeting",
+      body: "*"
+    };
+  }
+
+  // AddMeetingRequestV1V1 create new Meeting
+  rpc UpdateMeetingV1(UpdateMeetingRequestV1) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/meeting/{id}",
+      body: "*"
     };
   }
 
   // DescribeMeetingV1 get Meeting Info by ID
   rpc DescribeMeetingV1(MeetingIDRequestV1) returns (MeetingResponseV1) {
     option (google.api.http) = {
-      get: "/v1/meeting"
+      get: "/v1/meeting/{id}"
     };
   }
 
   // ListMeetingsV1 get all Meetings
-  rpc ListMeetingsV1(google.protobuf.Empty) returns (ListMeetingsResponseV1){
+  rpc ListMeetingsV1(ListMeetingsRequestV1) returns (ListMeetingsResponseV1){
     option (google.api.http) = {
       get: "/v1/list"
     };
@@ -33,28 +43,40 @@ service Meetings {
   // RemoveMeetingV1 remove Meeting by ID
   rpc RemoveMeetingV1(MeetingIDRequestV1) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      delete: "/v1/meeting"
+      delete: "/v1/meeting/{id}"
     };
   };
 }
 
 message AddMeetingRequestV1{
   uint64 userid = 2;
-  MeetingStateV1 state = 3;
-  MeetingUsersV1 users = 4;
+  string title = 3;
+  google.protobuf.Timestamp date = 4;
+  MeetingStateV1 state = 5;
+  repeated uint64 users = 6;
+}
+
+message UpdateMeetingRequestV1{
+  string id = 1;
+  uint64 userid = 2;
+  string title = 3;
+  google.protobuf.Timestamp date = 4;
+  MeetingStateV1 state = 5;
+  repeated uint64 users = 6;
+}
+
+message ListMeetingsRequestV1 {
+  uint64 limit = 1;
+  uint64 offset = 2;
 }
 
 message MeetingIDRequestV1 {
-  UUID id = 1;
+  string id = 1;
 }
 
 message MeetingStateV1{
   uint64 id = 1;
   string name = 2;
-}
-
-message MeetingUsersV1{
-  repeated uint64 Users = 1;
 }
 
 message ListMeetingsResponseV1{
@@ -64,8 +86,10 @@ message ListMeetingsResponseV1{
 message MeetingResponseV1{
   UUID id = 1;
   uint64 userid = 2;
-  MeetingStateV1 state = 3;
-  MeetingUsersV1 users = 4;
+  string title = 3;
+  google.protobuf.Timestamp date = 4;
+  MeetingStateV1 state = 5;
+  repeated uint64 users = 6;
 }
 
 message UUID {

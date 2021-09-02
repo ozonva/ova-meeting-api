@@ -21,10 +21,12 @@ const _ = grpc.SupportPackageIsVersion7
 type MeetingsClient interface {
 	// AddMeetingRequestV1V1 create new Meeting
 	CreateMeetingV1(ctx context.Context, in *AddMeetingRequestV1, opts ...grpc.CallOption) (*empty.Empty, error)
+	// AddMeetingRequestV1V1 create new Meeting
+	UpdateMeetingV1(ctx context.Context, in *UpdateMeetingRequestV1, opts ...grpc.CallOption) (*empty.Empty, error)
 	// DescribeMeetingV1 get Meeting Info by ID
 	DescribeMeetingV1(ctx context.Context, in *MeetingIDRequestV1, opts ...grpc.CallOption) (*MeetingResponseV1, error)
 	// ListMeetingsV1 get all Meetings
-	ListMeetingsV1(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*ListMeetingsResponseV1, error)
+	ListMeetingsV1(ctx context.Context, in *ListMeetingsRequestV1, opts ...grpc.CallOption) (*ListMeetingsResponseV1, error)
 	// RemoveMeetingV1 remove Meeting by ID
 	RemoveMeetingV1(ctx context.Context, in *MeetingIDRequestV1, opts ...grpc.CallOption) (*empty.Empty, error)
 }
@@ -46,6 +48,15 @@ func (c *meetingsClient) CreateMeetingV1(ctx context.Context, in *AddMeetingRequ
 	return out, nil
 }
 
+func (c *meetingsClient) UpdateMeetingV1(ctx context.Context, in *UpdateMeetingRequestV1, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/ova.meeting.api.Meetings/UpdateMeetingV1", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *meetingsClient) DescribeMeetingV1(ctx context.Context, in *MeetingIDRequestV1, opts ...grpc.CallOption) (*MeetingResponseV1, error) {
 	out := new(MeetingResponseV1)
 	err := c.cc.Invoke(ctx, "/ova.meeting.api.Meetings/DescribeMeetingV1", in, out, opts...)
@@ -55,7 +66,7 @@ func (c *meetingsClient) DescribeMeetingV1(ctx context.Context, in *MeetingIDReq
 	return out, nil
 }
 
-func (c *meetingsClient) ListMeetingsV1(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*ListMeetingsResponseV1, error) {
+func (c *meetingsClient) ListMeetingsV1(ctx context.Context, in *ListMeetingsRequestV1, opts ...grpc.CallOption) (*ListMeetingsResponseV1, error) {
 	out := new(ListMeetingsResponseV1)
 	err := c.cc.Invoke(ctx, "/ova.meeting.api.Meetings/ListMeetingsV1", in, out, opts...)
 	if err != nil {
@@ -79,10 +90,12 @@ func (c *meetingsClient) RemoveMeetingV1(ctx context.Context, in *MeetingIDReque
 type MeetingsServer interface {
 	// AddMeetingRequestV1V1 create new Meeting
 	CreateMeetingV1(context.Context, *AddMeetingRequestV1) (*empty.Empty, error)
+	// AddMeetingRequestV1V1 create new Meeting
+	UpdateMeetingV1(context.Context, *UpdateMeetingRequestV1) (*empty.Empty, error)
 	// DescribeMeetingV1 get Meeting Info by ID
 	DescribeMeetingV1(context.Context, *MeetingIDRequestV1) (*MeetingResponseV1, error)
 	// ListMeetingsV1 get all Meetings
-	ListMeetingsV1(context.Context, *empty.Empty) (*ListMeetingsResponseV1, error)
+	ListMeetingsV1(context.Context, *ListMeetingsRequestV1) (*ListMeetingsResponseV1, error)
 	// RemoveMeetingV1 remove Meeting by ID
 	RemoveMeetingV1(context.Context, *MeetingIDRequestV1) (*empty.Empty, error)
 	mustEmbedUnimplementedMeetingsServer()
@@ -95,10 +108,13 @@ type UnimplementedMeetingsServer struct {
 func (UnimplementedMeetingsServer) CreateMeetingV1(context.Context, *AddMeetingRequestV1) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMeetingV1 not implemented")
 }
+func (UnimplementedMeetingsServer) UpdateMeetingV1(context.Context, *UpdateMeetingRequestV1) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMeetingV1 not implemented")
+}
 func (UnimplementedMeetingsServer) DescribeMeetingV1(context.Context, *MeetingIDRequestV1) (*MeetingResponseV1, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DescribeMeetingV1 not implemented")
 }
-func (UnimplementedMeetingsServer) ListMeetingsV1(context.Context, *empty.Empty) (*ListMeetingsResponseV1, error) {
+func (UnimplementedMeetingsServer) ListMeetingsV1(context.Context, *ListMeetingsRequestV1) (*ListMeetingsResponseV1, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListMeetingsV1 not implemented")
 }
 func (UnimplementedMeetingsServer) RemoveMeetingV1(context.Context, *MeetingIDRequestV1) (*empty.Empty, error) {
@@ -135,6 +151,24 @@ func _Meetings_CreateMeetingV1_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Meetings_UpdateMeetingV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMeetingRequestV1)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MeetingsServer).UpdateMeetingV1(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ova.meeting.api.Meetings/UpdateMeetingV1",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MeetingsServer).UpdateMeetingV1(ctx, req.(*UpdateMeetingRequestV1))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Meetings_DescribeMeetingV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MeetingIDRequestV1)
 	if err := dec(in); err != nil {
@@ -154,7 +188,7 @@ func _Meetings_DescribeMeetingV1_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _Meetings_ListMeetingsV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(empty.Empty)
+	in := new(ListMeetingsRequestV1)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -166,7 +200,7 @@ func _Meetings_ListMeetingsV1_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: "/ova.meeting.api.Meetings/ListMeetingsV1",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MeetingsServer).ListMeetingsV1(ctx, req.(*empty.Empty))
+		return srv.(MeetingsServer).ListMeetingsV1(ctx, req.(*ListMeetingsRequestV1))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -199,6 +233,10 @@ var Meetings_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateMeetingV1",
 			Handler:    _Meetings_CreateMeetingV1_Handler,
+		},
+		{
+			MethodName: "UpdateMeetingV1",
+			Handler:    _Meetings_UpdateMeetingV1_Handler,
 		},
 		{
 			MethodName: "DescribeMeetingV1",

@@ -2,13 +2,20 @@ package main
 
 import (
 	"context"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ozonva/ova-meeting-api/internal/api"
-	desc "github.com/ozonva/ova-meeting-api/pkg/ova-meeting-api"
-	"google.golang.org/grpc"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
+	"os"
+
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
+	"github.com/ozonva/ova-meeting-api/internal/api"
+	"github.com/ozonva/ova-meeting-api/internal/connection"
+	"github.com/ozonva/ova-meeting-api/internal/repo"
+	desc "github.com/ozonva/ova-meeting-api/pkg/ova-meeting-api"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -37,14 +44,15 @@ func runJSON() {
 	}
 }
 
-func run() error {
+func run(dbConn *sqlx.DB) error {
+	ctx := context.TODO()
 	listen, err := net.Listen("tcp", grpcPort)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
 	s := grpc.NewServer()
-	desc.RegisterMeetingsServer(s, api.NewApiServer())
+	desc.RegisterMeetingsServer(s, api.NewApiServer(repo.NewRepo(ctx, dbConn)))
 
 	if err := s.Serve(listen); err != nil {
 		log.Fatalf("failed to serve: %v", err)
@@ -54,9 +62,24 @@ func run() error {
 }
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("No .env file found")
+	}
 	go runJSON()
 
-	if err := run(); err != nil {
+	dsn := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_LOCAL_PORT"),
+		os.Getenv("POSTGRES_DB"),
+	)
+	dbConn := connection.Connect(dsn)
+	if err := dbConn.Ping(); err != nil {
+		log.Fatal(err)
+	}
+	if err := run(dbConn); err != nil {
 		log.Fatal(err)
 	}
 }

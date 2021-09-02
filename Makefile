@@ -1,7 +1,9 @@
+include .env
 LOCAL_BIN:=$(CURDIR)/bin
 GOBIN?=$(GOPATH)/bin
+DBSTRING:="postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(DB_HOST):$(DB_LOCAL_PORT)/$(POSTGRES_DB)?sslmode=disable"
 
-.PHONY: run, test, generate, deps
+.PHONY: run, test, generate, deps, migrate
 export GO111MODULE=on
 export GOPROXY=https://proxy.golang.org|direct
 
@@ -16,13 +18,15 @@ run:
 
 .PHONY: test
 test:
-	 go test ./internal/utils/
-	 go test ./internal/models/
-	 go test ./internal/flusher/
-	 go test ./internal/saver/
+	go test ./internal/utils/
+	go test ./internal/models/
+	go test ./internal/flusher/
+	go test ./internal/saver/
+	go test ./internal/api/
 
 .PHONY: generate
 generate:
+	go generate ./...
 	PATH="${PATH}:$(LOCAL_BIN)" GOBIN=$(LOCAL_BIN) protoc -I $(CURDIR)/proto \
         --go_out=$(CURDIR)/pkg --go_opt=paths=source_relative \
         --go-grpc_out=$(CURDIR)/pkg --go-grpc_opt=paths=source_relative \
@@ -47,3 +51,9 @@ install-go-deps:
 	GOBIN=$(LOCAL_BIN) go get -u github.com/onsi/gomega
 	GOBIN=$(LOCAL_BIN) go get -u github.com/golang/mock
 	GOBIN=$(LOCAL_BIN) go get -u github.com/rs/zerolog/log
+	GOBIN=$(LOCAL_BIN) go get -u github.com/pressly/goose/v3/cmd/goose
+
+.PHONY: migrate
+migrate:
+	PATH="${PATH}:$(LOCAL_BIN)" GOBIN=$(LOCAL_BIN) GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DBSTRING) goose -dir db/migrations status
+	PATH="${PATH}:$(LOCAL_BIN)" GOBIN=$(LOCAL_BIN) GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DBSTRING) goose -dir db/migrations up

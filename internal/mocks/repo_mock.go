@@ -48,11 +48,25 @@ func (mr *MockMeetingRepoMockRecorder) AddMeetings(arg0 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMeetings", reflect.TypeOf((*MockMeetingRepo)(nil).AddMeetings), arg0)
 }
 
+// DeleteMeeting mocks base method
+func (m *MockMeetingRepo) DeleteMeeting(arg0 uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteMeeting", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteMeeting indicates an expected call of DeleteMeeting
+func (mr *MockMeetingRepoMockRecorder) DeleteMeeting(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMeeting", reflect.TypeOf((*MockMeetingRepo)(nil).DeleteMeeting), arg0)
+}
+
 // DescribeMeeting mocks base method
-func (m *MockMeetingRepo) DescribeMeeting(arg0 uuid.UUID) (*models.Meeting, error) {
+func (m *MockMeetingRepo) DescribeMeeting(arg0 uuid.UUID) (models.Meeting, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DescribeMeeting", arg0)
-	ret0, _ := ret[0].(*models.Meeting)
+	ret0, _ := ret[0].(models.Meeting)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -76,4 +90,18 @@ func (m *MockMeetingRepo) ListMeetings(arg0, arg1 uint64) ([]models.Meeting, err
 func (mr *MockMeetingRepoMockRecorder) ListMeetings(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMeetings", reflect.TypeOf((*MockMeetingRepo)(nil).ListMeetings), arg0, arg1)
+}
+
+// UpdateMeeting mocks base method
+func (m *MockMeetingRepo) UpdateMeeting(arg0 models.Meeting) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMeeting", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateMeeting indicates an expected call of UpdateMeeting
+func (mr *MockMeetingRepoMockRecorder) UpdateMeeting(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMeeting", reflect.TypeOf((*MockMeetingRepo)(nil).UpdateMeeting), arg0)
 }
