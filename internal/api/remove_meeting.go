@@ -21,7 +21,7 @@ func (s *Server) RemoveMeetingV1(ctx context.Context, req *desc.MeetingIDRequest
 		log.Error().Err(err)
 		return nil, err
 	}
-	err = s.repo.DeleteMeeting(meetingId)
+	err = s.repo.DeleteMeeting(ctx, meetingId)
 	if err != nil {
 		log.Error().Err(err)
 		return nil, err

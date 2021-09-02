@@ -15,11 +15,11 @@ import (
 
 // MeetingRepo storage interface of Meeting Entity
 type MeetingRepo interface {
-	AddMeetings(meetings []models.Meeting) error
+	AddMeetings(ctx context.Context, meetings []models.Meeting) error
 	ListMeetings(limit, offset uint64) ([]models.Meeting, error)
 	DescribeMeeting(meetingId uuid.UUID) (models.Meeting, error)
-	DeleteMeeting(meetingId uuid.UUID) error
-	UpdateMeeting(meeting models.Meeting) error
+	DeleteMeeting(ctx context.Context, meetingId uuid.UUID) error
+	UpdateMeeting(ctx context.Context, meeting models.Meeting) error
 }
 
 type repo struct {
@@ -27,10 +27,9 @@ type repo struct {
 	ctx context.Context
 }
 
-func NewRepo(ctx context.Context, db *sqlx.DB) MeetingRepo {
+func NewRepo(db *sqlx.DB) MeetingRepo {
 	return &repo{
-		ctx: ctx,
-		db:  db,
+		db: db,
 	}
 }
 
@@ -65,7 +64,7 @@ func (r *repo) DescribeMeeting(meetingId uuid.UUID) (models.Meeting, error) {
 	return meeting, nil
 }
 
-func (r *repo) addMeeting(meeting models.Meeting) error {
+func (r *repo) addMeeting(ctx context.Context, meeting models.Meeting) error {
 	meeting.ID = uuid.New()
 	err := r.checkMeetingState(&meeting.State)
 	if err != nil {
@@ -81,12 +80,12 @@ func (r *repo) addMeeting(meeting models.Meeting) error {
 		return err
 	}
 
-	tx, err := r.db.BeginTxx(r.ctx, nil)
+	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return err
 	}
 
-	_, err = tx.Exec(query, args...)
+	_, err = tx.ExecContext(ctx, query, args...)
 	if err != nil {
 		errTx := tx.Rollback()
 		if errTx != nil {
@@ -110,7 +109,7 @@ func (r *repo) addMeeting(meeting models.Meeting) error {
 			return err
 		}
 
-		_, err = tx.Exec(addMeetingUser, args...)
+		_, err = tx.ExecContext(ctx, addMeetingUser, args...)
 		if err != nil {
 			errTx := tx.Rollback()
 			if errTx != nil {
@@ -126,9 +125,9 @@ func (r *repo) addMeeting(meeting models.Meeting) error {
 	return nil
 }
 
-func (r *repo) AddMeetings(meetings []models.Meeting) error {
+func (r *repo) AddMeetings(ctx context.Context, meetings []models.Meeting) error {
 	for _, meeting := range meetings {
-		err := r.addMeeting(meeting)
+		err := r.addMeeting(ctx, meeting)
 		if err != nil {
 			return err
 		}
@@ -184,8 +183,8 @@ func (r *repo) ListMeetings(limit, offset uint64) ([]models.Meeting, error) {
 	return result, nil
 }
 
-func (r *repo) UpdateMeeting(meeting models.Meeting) error {
-	tx, err := r.db.BeginTxx(r.ctx, nil)
+func (r *repo) UpdateMeeting(ctx context.Context, meeting models.Meeting) error {
+	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -218,7 +217,7 @@ func (r *repo) UpdateMeeting(meeting models.Meeting) error {
 		return err
 	}
 
-	_, err = tx.Exec(meetingsQuery, args...)
+	_, err = tx.ExecContext(ctx, meetingsQuery, args...)
 	if err != nil {
 		errTx := tx.Rollback()
 		if errTx != nil {
@@ -227,7 +226,7 @@ func (r *repo) UpdateMeeting(meeting models.Meeting) error {
 		return err
 	}
 
-	_, err = tx.Exec(clearMeetingUsers, args...)
+	_, err = tx.ExecContext(ctx, clearMeetingUsers, args...)
 	if err != nil {
 		errTx := tx.Rollback()
 		if errTx != nil {
@@ -250,7 +249,7 @@ func (r *repo) UpdateMeeting(meeting models.Meeting) error {
 			return err
 		}
 
-		_, err = tx.Exec(addMeetingUser, args...)
+		_, err = tx.ExecContext(ctx, addMeetingUser, args...)
 		if err != nil {
 			errTx := tx.Rollback()
 			if errTx != nil {
@@ -267,8 +266,8 @@ func (r *repo) UpdateMeeting(meeting models.Meeting) error {
 	return nil
 }
 
-func (r *repo) DeleteMeeting(meetingId uuid.UUID) error {
-	tx, err := r.db.BeginTxx(r.ctx, nil)
+func (r *repo) DeleteMeeting(ctx context.Context, meetingId uuid.UUID) error {
+	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -287,7 +286,7 @@ func (r *repo) DeleteMeeting(meetingId uuid.UUID) error {
 		return err
 	}
 
-	_, err = tx.ExecContext(r.ctx, queryMeetings, args...)
+	_, err = tx.ExecContext(ctx, queryMeetings, args...)
 	if err != nil {
 		errTx := tx.Rollback()
 		if errTx != nil {
@@ -295,7 +294,7 @@ func (r *repo) DeleteMeeting(meetingId uuid.UUID) error {
 		}
 		return err
 	}
-	_, err = tx.ExecContext(r.ctx, queryMeetingUsers, args...)
+	_, err = tx.ExecContext(ctx, queryMeetingUsers, args...)
 	if err != nil {
 		errTx := tx.Rollback()
 		if errTx != nil {
