@@ -27,10 +27,10 @@ type repo struct {
 	ctx context.Context
 }
 
-func NewRepo(db *sqlx.DB, ctx context.Context) MeetingRepo {
+func NewRepo(ctx context.Context, db *sqlx.DB) MeetingRepo {
 	return &repo{
-		db:  db,
 		ctx: ctx,
+		db:  db,
 	}
 }
 
@@ -62,15 +62,12 @@ func (r *repo) DescribeMeeting(meetingId uuid.UUID) (models.Meeting, error) {
 	if err != nil {
 		return meeting, err
 	}
-	log.Println(meeting)
 	return meeting, nil
 }
 
 func (r *repo) addMeeting(meeting models.Meeting) error {
 	meeting.ID = uuid.New()
-	log.Println(meeting)
 	err := r.checkMeetingState(&meeting.State)
-	log.Println(meeting.State)
 	if err != nil {
 		return err
 	}
@@ -81,7 +78,6 @@ func (r *repo) addMeeting(meeting models.Meeting) error {
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
@@ -111,7 +107,6 @@ func (r *repo) addMeeting(meeting models.Meeting) error {
 			if errTx != nil {
 				return errTx
 			}
-			log.Println(err)
 			return err
 		}
 
@@ -121,11 +116,9 @@ func (r *repo) addMeeting(meeting models.Meeting) error {
 			if errTx != nil {
 				return errTx
 			}
-			log.Println(err)
 			return err
 		}
 	}
-	log.Println("Success")
 	err = tx.Commit()
 	if err != nil {
 		return err
@@ -349,16 +342,13 @@ func (r *repo) checkMeetingState(state *models.MeetingState) error {
 		}
 		row := r.db.QueryRowx(insertQuery, args...)
 		if err != nil {
-			log.Println(insertQuery)
-			log.Println(err)
+			return err
 		}
 		err = row.Scan(&resState.ID)
 		if err != nil {
-			log.Println(3)
-			log.Println(err)
+			return err
 		}
 	} else if err != nil {
-		log.Println(err)
 		return err
 	}
 	state.ID = resState.ID

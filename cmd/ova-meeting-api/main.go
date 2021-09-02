@@ -52,7 +52,7 @@ func run(dbConn *sqlx.DB) error {
 	}
 
 	s := grpc.NewServer()
-	desc.RegisterMeetingsServer(s, api.NewApiServer(repo.NewRepo(dbConn, ctx)))
+	desc.RegisterMeetingsServer(s, api.NewApiServer(repo.NewRepo(ctx, dbConn)))
 
 	if err := s.Serve(listen); err != nil {
 		log.Fatalf("failed to serve: %v", err)
