@@ -39,7 +39,7 @@ var _ = Describe("Api", func() {
 
 	Context("Api create", func() {
 		It("Should not error", func() {
-			mockRepo.EXPECT().AddMeetings(gomock.Any()).Return(nil).Times(5)
+			mockRepo.EXPECT().AddMeetings(ctx, gomock.Any()).Return(nil).Times(5)
 			apiServer := api.NewApiServer(mockRepo)
 			for _, meeting := range meetings {
 				_, err := apiServer.CreateMeetingV1(ctx, &desc.AddMeetingRequestV1{
@@ -79,7 +79,7 @@ var _ = Describe("Api", func() {
 	})
 	Context("Api remove", func() {
 		It("Should not error", func() {
-			mockRepo.EXPECT().DeleteMeeting(gomock.Any()).Return(nil).Times(1)
+			mockRepo.EXPECT().DeleteMeeting(ctx, gomock.Any()).Return(nil).Times(1)
 			apiServer := api.NewApiServer(mockRepo)
 
 			_, err := apiServer.RemoveMeetingV1(ctx, &desc.MeetingIDRequestV1{Id: meetings[0].ID.String()})
@@ -88,7 +88,7 @@ var _ = Describe("Api", func() {
 	})
 	Context("Api update", func() {
 		It("Should not error", func() {
-			mockRepo.EXPECT().UpdateMeeting(gomock.Any()).Return(nil).Times(5)
+			mockRepo.EXPECT().UpdateMeeting(ctx, gomock.Any()).Return(nil).Times(5)
 			apiServer := api.NewApiServer(mockRepo)
 			for _, meeting := range meetings {
 				_, err := apiServer.UpdateMeetingV1(ctx, &desc.UpdateMeetingRequestV1{
