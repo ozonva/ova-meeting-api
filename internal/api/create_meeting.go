@@ -19,7 +19,7 @@ func (s *Server) CreateMeetingV1(ctx context.Context, req *desc.AddMeetingReques
 		Str("State", req.State.Name).
 		Interface("Users", req.Users).Msg("")
 
-	err := s.repo.AddMeetings([]models.Meeting{{
+	err := s.repo.AddMeetings(ctx, []models.Meeting{{
 		Title:  req.Title,
 		UserID: req.Userid,
 		Date:   req.Date.AsTime(),

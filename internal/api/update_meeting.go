@@ -26,7 +26,7 @@ func (s *Server) UpdateMeetingV1(ctx context.Context, req *desc.UpdateMeetingReq
 		log.Error().Err(err)
 		return nil, err
 	}
-	err = s.repo.UpdateMeeting(models.Meeting{
+	err = s.repo.UpdateMeeting(ctx, models.Meeting{
 		ID:     meetingId,
 		Title:  req.Title,
 		UserID: req.Userid,

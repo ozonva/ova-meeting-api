@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	context "context"
 	gomock "github.com/golang/mock/gomock"
 	uuid "github.com/google/uuid"
 	models "github.com/ozonva/ova-meeting-api/internal/models"
@@ -35,31 +36,31 @@ func (m *MockMeetingRepo) EXPECT() *MockMeetingRepoMockRecorder {
 }
 
 // AddMeetings mocks base method
-func (m *MockMeetingRepo) AddMeetings(arg0 []models.Meeting) error {
+func (m *MockMeetingRepo) AddMeetings(arg0 context.Context, arg1 []models.Meeting) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddMeetings", arg0)
+	ret := m.ctrl.Call(m, "AddMeetings", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // AddMeetings indicates an expected call of AddMeetings
-func (mr *MockMeetingRepoMockRecorder) AddMeetings(arg0 interface{}) *gomock.Call {
+func (mr *MockMeetingRepoMockRecorder) AddMeetings(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMeetings", reflect.TypeOf((*MockMeetingRepo)(nil).AddMeetings), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMeetings", reflect.TypeOf((*MockMeetingRepo)(nil).AddMeetings), arg0, arg1)
 }
 
 // DeleteMeeting mocks base method
-func (m *MockMeetingRepo) DeleteMeeting(arg0 uuid.UUID) error {
+func (m *MockMeetingRepo) DeleteMeeting(arg0 context.Context, arg1 uuid.UUID) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteMeeting", arg0)
+	ret := m.ctrl.Call(m, "DeleteMeeting", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteMeeting indicates an expected call of DeleteMeeting
-func (mr *MockMeetingRepoMockRecorder) DeleteMeeting(arg0 interface{}) *gomock.Call {
+func (mr *MockMeetingRepoMockRecorder) DeleteMeeting(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMeeting", reflect.TypeOf((*MockMeetingRepo)(nil).DeleteMeeting), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMeeting", reflect.TypeOf((*MockMeetingRepo)(nil).DeleteMeeting), arg0, arg1)
 }
 
 // DescribeMeeting mocks base method
@@ -93,15 +94,15 @@ func (mr *MockMeetingRepoMockRecorder) ListMeetings(arg0, arg1 interface{}) *gom
 }
 
 // UpdateMeeting mocks base method
-func (m *MockMeetingRepo) UpdateMeeting(arg0 models.Meeting) error {
+func (m *MockMeetingRepo) UpdateMeeting(arg0 context.Context, arg1 models.Meeting) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateMeeting", arg0)
+	ret := m.ctrl.Call(m, "UpdateMeeting", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateMeeting indicates an expected call of UpdateMeeting
-func (mr *MockMeetingRepoMockRecorder) UpdateMeeting(arg0 interface{}) *gomock.Call {
+func (mr *MockMeetingRepoMockRecorder) UpdateMeeting(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMeeting", reflect.TypeOf((*MockMeetingRepo)(nil).UpdateMeeting), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMeeting", reflect.TypeOf((*MockMeetingRepo)(nil).UpdateMeeting), arg0, arg1)
 }
