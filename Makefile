@@ -1,12 +1,15 @@
 include .env
 LOCAL_BIN:=$(CURDIR)/bin
 GOBIN?=$(GOPATH)/bin
-DBSTRING:="postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(DB_HOST):$(DB_LOCAL_PORT)/$(POSTGRES_DB)?sslmode=disable"
+DBSTRING:="postgres://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
 
 .PHONY: run, test, generate, deps, migrate
 export GO111MODULE=on
 export GOPROXY=https://proxy.golang.org|direct
 
+.PHONY: lint
+lint:
+	golangci-lint run --skip-dirs $(CURDIR)/data
 
 .PHONY: build
 build:
@@ -24,12 +27,17 @@ test:
 	go test ./internal/saver/
 	go test ./internal/api/
 
+.PHONY: cover
+cover:
+	go test -v ./internal/... -coverprofile .testCoverage.txt
+
 .PHONY: generate
 generate:
-	go generate ./...
+	go generate internal/mockgen.go
 	PATH="${PATH}:$(LOCAL_BIN)" GOBIN=$(LOCAL_BIN) protoc -I $(CURDIR)/proto \
         --go_out=$(CURDIR)/pkg --go_opt=paths=source_relative \
         --go-grpc_out=$(CURDIR)/pkg --go-grpc_opt=paths=source_relative \
+        --validate_out lang=go:pkg/ova-meeting-api \
         --grpc-gateway_out=$(CURDIR)/pkg --grpc-gateway_opt paths=source_relative \
         $(CURDIR)/proto/ova-meeting-api/*.proto
 
@@ -52,6 +60,8 @@ install-go-deps:
 	GOBIN=$(LOCAL_BIN) go get -u github.com/golang/mock
 	GOBIN=$(LOCAL_BIN) go get -u github.com/rs/zerolog/log
 	GOBIN=$(LOCAL_BIN) go get -u github.com/pressly/goose/v3/cmd/goose
+	GOBIN=$(LOCAL_BIN) go get -u github.com/envoyproxy/protoc-gen-validate
+	GOBIN=$(LOCAL_BIN) go install github.com/envoyproxy/protoc-gen-validate
 
 .PHONY: migrate
 migrate:

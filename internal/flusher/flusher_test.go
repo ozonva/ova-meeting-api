@@ -3,8 +3,8 @@ package flusher_test
 import (
 	"context"
 	"fmt"
-
 	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/ozonva/ova-meeting-api/internal/flusher"
@@ -45,7 +45,7 @@ var _ = Describe("Flusher", func() {
 			Context("Write count less than chunkSize", func() {
 				oneMeeting := meetings[:1]
 				BeforeEach(func() {
-					mockRepo.EXPECT().AddMeetings(ctx, oneMeeting).Return(nil).Times(1)
+					mockRepo.EXPECT().AddMeetings(ctx, oneMeeting).Return([]uuid.UUID{}, nil).Times(1)
 				})
 				It("Should return nil", func() {
 					AssertReturnNil(oneMeeting)
@@ -54,7 +54,7 @@ var _ = Describe("Flusher", func() {
 			Context("Write count equal chunkSize", func() {
 				meetings := meetings[:chunkSize]
 				BeforeEach(func() {
-					mockRepo.EXPECT().AddMeetings(ctx, meetings).Return(nil).Times(1)
+					mockRepo.EXPECT().AddMeetings(ctx, meetings).Return([]uuid.UUID{}, nil).Times(1)
 				})
 				It("Should return nil", func() {
 					AssertReturnNil(meetings)
@@ -63,9 +63,9 @@ var _ = Describe("Flusher", func() {
 			Context("Write count more than chunkSize", func() {
 				BeforeEach(func() {
 					gomock.InOrder(
-						mockRepo.EXPECT().AddMeetings(ctx, meetings[:chunkSize]).Return(nil).Times(1),
-						mockRepo.EXPECT().AddMeetings(ctx, meetings[chunkSize:chunkSize*2]).Return(nil).Times(1),
-						mockRepo.EXPECT().AddMeetings(ctx, meetings[chunkSize*2:]).Return(nil).Times(1),
+						mockRepo.EXPECT().AddMeetings(ctx, meetings[:chunkSize]).Return([]uuid.UUID{}, nil).Times(1),
+						mockRepo.EXPECT().AddMeetings(ctx, meetings[chunkSize:chunkSize*2]).Return([]uuid.UUID{}, nil).Times(1),
+						mockRepo.EXPECT().AddMeetings(ctx, meetings[chunkSize*2:]).Return([]uuid.UUID{}, nil).Times(1),
 					)
 				})
 				It("Should return nil", func() {
@@ -81,9 +81,9 @@ var _ = Describe("Flusher", func() {
 			Context("All data", func() {
 				BeforeEach(func() {
 					gomock.InOrder(
-						mockRepo.EXPECT().AddMeetings(ctx, meetings[:chunkSize]).Return(err).Times(1),
-						mockRepo.EXPECT().AddMeetings(ctx, meetings[chunkSize:chunkSize*2]).Return(err).Times(1),
-						mockRepo.EXPECT().AddMeetings(ctx, meetings[chunkSize*2:]).Return(err).Times(1),
+						mockRepo.EXPECT().AddMeetings(ctx, meetings[:chunkSize]).Return([]uuid.UUID{}, err).Times(1),
+						mockRepo.EXPECT().AddMeetings(ctx, meetings[chunkSize:chunkSize*2]).Return([]uuid.UUID{}, err).Times(1),
+						mockRepo.EXPECT().AddMeetings(ctx, meetings[chunkSize*2:]).Return([]uuid.UUID{}, err).Times(1),
 					)
 				})
 				It("Should return all data", func() {
@@ -93,9 +93,9 @@ var _ = Describe("Flusher", func() {
 			Context("Error write first chunk", func() {
 				BeforeEach(func() {
 					gomock.InOrder(
-						mockRepo.EXPECT().AddMeetings(ctx, meetings[:chunkSize]).Return(err).Times(1),
-						mockRepo.EXPECT().AddMeetings(ctx, meetings[chunkSize:chunkSize*2]).Return(nil).Times(1),
-						mockRepo.EXPECT().AddMeetings(ctx, meetings[chunkSize*2:]).Return(nil).Times(1),
+						mockRepo.EXPECT().AddMeetings(ctx, meetings[:chunkSize]).Return([]uuid.UUID{}, err).Times(1),
+						mockRepo.EXPECT().AddMeetings(ctx, meetings[chunkSize:chunkSize*2]).Return([]uuid.UUID{}, nil).Times(1),
+						mockRepo.EXPECT().AddMeetings(ctx, meetings[chunkSize*2:]).Return([]uuid.UUID{}, nil).Times(1),
 					)
 				})
 				It("Should return first chunk", func() {

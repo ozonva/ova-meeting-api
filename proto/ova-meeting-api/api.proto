@@ -5,6 +5,7 @@ package ova.meeting.api;
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
+import "envoyproxy/protoc-gen-validate/validate.proto";
 
 option go_package = "github.com/ozonva/ova-meeting-api/pkg/ova-meeting-api";
 
@@ -13,7 +14,15 @@ service Meetings {
   // AddMeetingRequestV1V1 create new Meeting
   rpc CreateMeetingV1(AddMeetingRequestV1) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/v1/add-meeting",
+      post: "/v1/meeting",
+      body: "*"
+    };
+  }
+
+  // Создает несколько новых опросов
+  rpc MultiCreateMeetingV1(MultiCreateMeetingRequestV1) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/meetings"
       body: "*"
     };
   }
@@ -49,16 +58,20 @@ service Meetings {
 }
 
 message AddMeetingRequestV1{
-  uint64 userid = 2;
+  uint64 userid = 2 [(validate.rules).uint64.gt = 0];
   string title = 3;
   google.protobuf.Timestamp date = 4;
   MeetingStateV1 state = 5;
   repeated uint64 users = 6;
 }
 
+message MultiCreateMeetingRequestV1 {
+  repeated AddMeetingRequestV1 meetings = 1 [(validate.rules).repeated.min_items = 1];
+}
+
 message UpdateMeetingRequestV1{
   string id = 1;
-  uint64 userid = 2;
+  uint64 userid = 2 [(validate.rules).uint64.gt = 0];
   string title = 3;
   google.protobuf.Timestamp date = 4;
   MeetingStateV1 state = 5;
@@ -66,7 +79,7 @@ message UpdateMeetingRequestV1{
 }
 
 message ListMeetingsRequestV1 {
-  uint64 limit = 1;
+  uint64 limit = 1 [(validate.rules).uint64.gt = 0];
   uint64 offset = 2;
 }
 
