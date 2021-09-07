@@ -36,11 +36,12 @@ func (m *MockMeetingRepo) EXPECT() *MockMeetingRepoMockRecorder {
 }
 
 // AddMeetings mocks base method
-func (m *MockMeetingRepo) AddMeetings(arg0 context.Context, arg1 []models.Meeting) error {
+func (m *MockMeetingRepo) AddMeetings(arg0 context.Context, arg1 []models.Meeting) ([]uuid.UUID, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddMeetings", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].([]uuid.UUID)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // AddMeetings indicates an expected call of AddMeetings

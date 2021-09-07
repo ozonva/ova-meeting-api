@@ -15,7 +15,7 @@ import (
 
 // MeetingRepo storage interface of Meeting Entity
 type MeetingRepo interface {
-	AddMeetings(ctx context.Context, meetings []models.Meeting) error
+	AddMeetings(ctx context.Context, meetings []models.Meeting) ([]uuid.UUID, error)
 	ListMeetings(limit, offset uint64) ([]models.Meeting, error)
 	DescribeMeeting(meetingId uuid.UUID) (models.Meeting, error)
 	DeleteMeeting(ctx context.Context, meetingId uuid.UUID) error
@@ -64,11 +64,12 @@ func (r *repo) DescribeMeeting(meetingId uuid.UUID) (models.Meeting, error) {
 	return meeting, nil
 }
 
-func (r *repo) addMeeting(ctx context.Context, meeting models.Meeting) error {
+func (r *repo) addMeeting(ctx context.Context, meeting models.Meeting) (uuid.UUID, error) {
 	meeting.ID = uuid.New()
+	emptyUuid := uuid.UUID{}
 	err := r.checkMeetingState(&meeting.State)
 	if err != nil {
-		return err
+		return emptyUuid, err
 	}
 	query, args, err := squirrel.
 		Insert("meetings").
@@ -77,21 +78,21 @@ func (r *repo) addMeeting(ctx context.Context, meeting models.Meeting) error {
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-		return err
+		return emptyUuid, err
 	}
 
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
-		return err
+		return emptyUuid, err
 	}
 
 	_, err = tx.ExecContext(ctx, query, args...)
 	if err != nil {
 		errTx := tx.Rollback()
 		if errTx != nil {
-			return errTx
+			return emptyUuid, errTx
 		}
-		return err
+		return emptyUuid, err
 	}
 
 	for _, meetingUser := range meeting.Users {
@@ -104,35 +105,37 @@ func (r *repo) addMeeting(ctx context.Context, meeting models.Meeting) error {
 		if err != nil {
 			errTx := tx.Rollback()
 			if errTx != nil {
-				return errTx
+				return emptyUuid, errTx
 			}
-			return err
+			return emptyUuid, err
 		}
 
 		_, err = tx.ExecContext(ctx, addMeetingUser, args...)
 		if err != nil {
 			errTx := tx.Rollback()
 			if errTx != nil {
-				return errTx
+				return emptyUuid, errTx
 			}
-			return err
+			return emptyUuid, err
 		}
 	}
 	err = tx.Commit()
 	if err != nil {
-		return err
+		return emptyUuid, err
 	}
-	return nil
+	return meeting.ID, nil
 }
 
-func (r *repo) AddMeetings(ctx context.Context, meetings []models.Meeting) error {
+func (r *repo) AddMeetings(ctx context.Context, meetings []models.Meeting) ([]uuid.UUID, error) {
+	uuids := make([]uuid.UUID, 0, len(meetings))
 	for _, meeting := range meetings {
-		err := r.addMeeting(ctx, meeting)
+		resUuid, err := r.addMeeting(ctx, meeting)
 		if err != nil {
-			return err
+			return nil, err
 		}
+		uuids = append(uuids, resUuid)
 	}
-	return nil
+	return uuids, nil
 }
 
 func (r *repo) ListMeetings(limit, offset uint64) ([]models.Meeting, error) {

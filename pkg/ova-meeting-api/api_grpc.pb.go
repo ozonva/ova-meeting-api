@@ -21,6 +21,8 @@ const _ = grpc.SupportPackageIsVersion7
 type MeetingsClient interface {
 	// AddMeetingRequestV1V1 create new Meeting
 	CreateMeetingV1(ctx context.Context, in *AddMeetingRequestV1, opts ...grpc.CallOption) (*empty.Empty, error)
+	// Создает несколько новых опросов
+	MultiCreateMeetingV1(ctx context.Context, in *MultiCreateMeetingRequestV1, opts ...grpc.CallOption) (*empty.Empty, error)
 	// AddMeetingRequestV1V1 create new Meeting
 	UpdateMeetingV1(ctx context.Context, in *UpdateMeetingRequestV1, opts ...grpc.CallOption) (*empty.Empty, error)
 	// DescribeMeetingV1 get Meeting Info by ID
@@ -42,6 +44,15 @@ func NewMeetingsClient(cc grpc.ClientConnInterface) MeetingsClient {
 func (c *meetingsClient) CreateMeetingV1(ctx context.Context, in *AddMeetingRequestV1, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/ova.meeting.api.Meetings/CreateMeetingV1", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *meetingsClient) MultiCreateMeetingV1(ctx context.Context, in *MultiCreateMeetingRequestV1, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/ova.meeting.api.Meetings/MultiCreateMeetingV1", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -90,6 +101,8 @@ func (c *meetingsClient) RemoveMeetingV1(ctx context.Context, in *MeetingIDReque
 type MeetingsServer interface {
 	// AddMeetingRequestV1V1 create new Meeting
 	CreateMeetingV1(context.Context, *AddMeetingRequestV1) (*empty.Empty, error)
+	// Создает несколько новых опросов
+	MultiCreateMeetingV1(context.Context, *MultiCreateMeetingRequestV1) (*empty.Empty, error)
 	// AddMeetingRequestV1V1 create new Meeting
 	UpdateMeetingV1(context.Context, *UpdateMeetingRequestV1) (*empty.Empty, error)
 	// DescribeMeetingV1 get Meeting Info by ID
@@ -107,6 +120,9 @@ type UnimplementedMeetingsServer struct {
 
 func (UnimplementedMeetingsServer) CreateMeetingV1(context.Context, *AddMeetingRequestV1) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMeetingV1 not implemented")
+}
+func (UnimplementedMeetingsServer) MultiCreateMeetingV1(context.Context, *MultiCreateMeetingRequestV1) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MultiCreateMeetingV1 not implemented")
 }
 func (UnimplementedMeetingsServer) UpdateMeetingV1(context.Context, *UpdateMeetingRequestV1) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateMeetingV1 not implemented")
@@ -147,6 +163,24 @@ func _Meetings_CreateMeetingV1_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MeetingsServer).CreateMeetingV1(ctx, req.(*AddMeetingRequestV1))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Meetings_MultiCreateMeetingV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MultiCreateMeetingRequestV1)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MeetingsServer).MultiCreateMeetingV1(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ova.meeting.api.Meetings/MultiCreateMeetingV1",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MeetingsServer).MultiCreateMeetingV1(ctx, req.(*MultiCreateMeetingRequestV1))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -233,6 +267,10 @@ var Meetings_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateMeetingV1",
 			Handler:    _Meetings_CreateMeetingV1_Handler,
+		},
+		{
+			MethodName: "MultiCreateMeetingV1",
+			Handler:    _Meetings_MultiCreateMeetingV1_Handler,
 		},
 		{
 			MethodName: "UpdateMeetingV1",

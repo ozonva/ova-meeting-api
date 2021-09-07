@@ -27,7 +27,7 @@ func (f *flusher) Flush(meetings []models.Meeting) []models.Meeting {
 	var res []models.Meeting
 	ctx := context.TODO()
 	for _, meetingsPart := range utils.SplitSliceMeetings(meetings, f.chunkSize) {
-		if err := f.repo.AddMeetings(ctx, meetingsPart); err != nil {
+		if _, err := f.repo.AddMeetings(ctx, meetingsPart); err != nil {
 			res = append(res, meetingsPart...)
 		}
 	}
